@@ -5,6 +5,7 @@ import 'dart:math';
 import 'package:flame/components/component.dart';
 import 'package:flame/sprite.dart';
 import 'package:flame/position.dart';
+import '../components/collision.dart';
 // TODO: create abstract from this or base class for all user inputs and huds
 
 class UserActionInput extends SpriteComponent {
@@ -17,10 +18,8 @@ class UserActionInput extends SpriteComponent {
   // constructor
   UserActionInput(this.active, this.inactive, double dimensions, Position position) : super() {
     this.sprite = this.active;
-    this.width = dimensions;
-    this.height = dimensions;
-    this.x = position.x;
-    this.y = position.y;
+    this.resize(new Size.fromWidth(dimensions));
+    this.setByPosition(position);
     }
 
   @override
@@ -52,13 +51,32 @@ class UserActionInput extends SpriteComponent {
     return true;
   }
 
-  bool inBoundingBox(Position p) {
-    //TODO: vet this or look for an already built funtion, could use as interface for any entity
-    double v1 = sqrt(pow(this.y - p.y, 2) + pow(this.x - p.x, 2));
-    double v2 = sqrt(pow((this.y + this.height) - p.y, 2) + pow((this.x + this.width) - p.x, 2));
-    if(v1 < 75.0 && v2 < 75.0){
-      return true;
-    }
-    return false;
+  bool inBoundingBox(Offset event) {
+    CollisionBox eventBox = CollisionBox(
+      x: event.dx,
+      y: event.dy,
+      width: 10.0,
+      height: 10.0
+    );
+    final double obstacleX = this.x;
+    final double obstacleY = this.y;
+
+    return (eventBox.x < obstacleX + this.width &&
+        eventBox.y + eventBox.width > obstacleX &&
+        eventBox.y < this.y + this.height &&
+        eventBox.height + eventBox.y > obstacleY);
+  }
+  
+  Offset calculateSinCosine(Offset pos) {
+    // normalize the x and y based on a 0,0 center point
+    Offset center = new Offset(this.x + (this.width/2), this.y + (this.height/2));
+    double lenY = pos.dy - center.dy;
+    double lenX = pos.dx - center.dx;
+    double rad = this.width/2;
+    print('LenY: $lenY, c.y: ${center.dy}, pos.y: ${pos.dy}');
+    double cos = lenX/rad;
+    double sin = lenY/rad;
+    print('Cos: $cos, Sin: $sin}');
+    return new Offset(cos, sin);
   }
 }

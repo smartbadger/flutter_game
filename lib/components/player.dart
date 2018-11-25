@@ -13,7 +13,8 @@ class Player extends PositionComponent {
   Position velocity = new Position(320.0, 0.0);
   double y0, yf;
   String state;
-  Position targetPos;
+  double speedFactor = 1.0;
+  Offset targetPos;
   bool moving = false;
   Size dimensions = new Size(0.0, 0.0);
   double health = 100.0;
@@ -69,16 +70,19 @@ class Player extends PositionComponent {
     // TODO: needs better handling of radial movement, and doesn't turn off
     animations[state].update(t);
     if(this.moving == true){
-      if(targetPos.x > 75.0 && this.checkBoundsX()){
-        x = x+1;
-      }else if (this.checkBoundsX()) {
-        x = x-1;
-      }
-      if(targetPos.y > 325.00 && this.checkBoundsY()){
-        y = y+1;
-      }else if(this.checkBoundsY()) {
-        y = y-1;
-      }
+      x = (x + (this.speedFactor * targetPos.dx));
+      y = (y + (this.speedFactor * targetPos.dy));
+      print(x);
+//      if(targetPos.dx > && this.checkBoundsX()){
+//        x = x+1;
+//      }else if (this.checkBoundsX()) {
+//        x = x-1;
+//      }
+//      if(targetPos.dy > 325.00 && this.checkBoundsY()){
+//        y = y+1;
+//      }else if(this.checkBoundsY()) {
+//        y = y-1;
+//      }
     }
   }
 }

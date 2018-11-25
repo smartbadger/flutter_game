@@ -3,14 +3,13 @@ import 'dart:ui';
 import 'package:flame/components/component.dart';
 import 'package:flame/animation.dart';
 import 'package:flame/position.dart';
-import 'dart:math';
+import '../components/creep.dart';
 
+import 'dart:math';
 import 'package:flame/components/animation_component.dart';
 import 'package:flame/sprite.dart';
 import 'package:flame/flame.dart';
 import 'dart:async';
-
-import '../components/creep.dart';
 
 
 class Entity extends PositionComponent {
@@ -41,6 +40,7 @@ class Entity extends PositionComponent {
     animations['dead'] = new Animation.sequenced('knight_death_animation.png', 11, textureWidth: 24.0, textureHeight: 32.0)
       ..stepTime = 0.1;
     state = 'idle';
+
 
   }
   // TODO: trim to one function?

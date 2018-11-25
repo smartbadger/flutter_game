@@ -20,7 +20,6 @@ import 'package:flame/sprite.dart';
 import '../components/player.dart';
 import '../components/creep.dart';
 import '../components/entity.dart';
-import 'package:flutter_game/ui/gamePad.dart';
 import 'package:flutter_game/ui/userActionInput.dart';
 import '../util/background.dart';
 import '../ui/healthbar.dart';
@@ -46,7 +45,15 @@ class GameClass extends BaseGame {
   GameState get state => _state;
   double gameSpeed = 50.0;
   Player player = new Player();
-  UserControlPad controlPad = new UserControlPad();
+
+  UserActionInput controlPad = new UserActionInput(
+      new Sprite('raise_sprite.png', width : 150.0),
+      new Sprite('raise_sprite.png', x : 150.0, width : 150.0),
+      75.0,
+      new Position(10.0, 200.0)
+  )
+    ..coolDownLimit = 0.1;
+
   // TODO: create HUD builder that adds components on
   UserActionInput summon = new UserActionInput(
     new Sprite('raise_sprite.png', width : 150.0),
@@ -63,6 +70,7 @@ class GameClass extends BaseGame {
   )
     ..coolDownLimit = 3.5;
   StaticBackground bg = new StaticBackground();
+
   List<Creep> creepArray = new List();
   List<Entity> entityArray = new List();
   Position playerPos = new Position(0.0, 0.0);
@@ -87,17 +95,15 @@ class GameClass extends BaseGame {
     this.player.dimensions = this.dimensions;
     this.bg.load(['grass.png']);
     this.bg.resize(this.dimensions);
+    this.controlPad.setBySize(new Position(150.0, 150.0));
+    this.controlPad.setByPosition(new Position(this.dimensions.width * 0.025, (this.dimensions.height * 0.9725) - controlPad.height));
+    print(this.controlPad.x);
   }
   handleDrag(Offset offset) {
-    Position position = new Position.fromOffset(offset);
-    // TODO: this needs to be lighter weight
+    // TODO: this needs to be lighter weight consider having some mapping for any hud controls managed by a separate object
 
-    if( position.x < this.controlPad.cordRange['xMax']  &&
-        position.x > this.controlPad.cordRange['xMin']  &&
-        position.y < this.controlPad.cordRange['yMax']  &&
-        position.y > this.controlPad.cordRange['yMin'] ){
-
-      this.player.targetPos = position;
+    if(this.controlPad.inBoundingBox(offset)){
+      this.player.targetPos = this.controlPad.calculateSinCosine(offset);
       this.player.moving = true;
     }
   }
@@ -118,14 +124,14 @@ class GameClass extends BaseGame {
   }
   // TODO: create separate function that delegates action based on an array of components and distance from evt
   void generateCreep(Offset offset) {
-    Position position = new Position.fromOffset(offset);
-    if(this.summon.inBoundingBox(position)){
+
+    if(this.summon.inBoundingBox(offset)){
       this.summon.state = 'inactive';
       Creep newCreep = new Creep();
       this.creepArray.add(newCreep);
       add(newCreep);
     }
-    if(this.attack.inBoundingBox(position)){
+    if(this.attack.inBoundingBox(offset)){
       this.attack.state = 'inactive';
       Entity newEntity = new Entity();
       this.entityArray.add(newEntity);
@@ -145,7 +151,6 @@ class GameClass extends BaseGame {
 
 
   GestureRecognizer createDragRecognizer() {
-
     PanGestureRecognizer recognizer = new PanGestureRecognizer();
       recognizer.onStart = (DragStartDetails details) => this.handleDrag(details.globalPosition);
       recognizer.onUpdate = (DragUpdateDetails details) => this.handleDrag(details.globalPosition);
@@ -156,7 +161,7 @@ class GameClass extends BaseGame {
 
   GestureRecognizer createTapRecognizer() {
     TapGestureRecognizer recognizer = new TapGestureRecognizer();
-    recognizer..onTapDown = (TapDownDetails details) => this.generateCreep(details.globalPosition);
+    recognizer..onTapDown = (TapDownDetails details) => this.handleDrag(details.globalPosition);
     return recognizer;
   }
   // Game loops here
@@ -173,7 +178,7 @@ class GameClass extends BaseGame {
         }else {
           creep.state = 'idle';
         }
-        // TODO: flawed logic here, its just to get it workign
+        // TODO: flawed logic here, its just to get it working
         if(entityArray.length > 0 ){
           if(creep.distance(entityArray[0]) > (entityArray[0].width)){
             creep.attack(entityArray[0]);
