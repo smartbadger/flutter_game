@@ -1,7 +1,6 @@
 // Represents the button a user clicks to perform an action
 
 import 'dart:ui';
-import 'dart:math';
 import 'package:flame/components/component.dart';
 import 'package:flame/sprite.dart';
 import 'package:flame/position.dart';
@@ -14,13 +13,10 @@ class UserActionInput extends SpriteComponent {
   String state = 'active';
   double coolDownLimit, coolDown;
   Map cordRange;
+  Paint paint = new Paint()..color = Color.fromRGBO(255, 0, 0, 1.0);
 
   // constructor
-  UserActionInput(this.active, this.inactive, double dimensions, Position position) : super() {
-    this.sprite = this.active;
-    this.resize(new Size.fromWidth(dimensions));
-    this.setByPosition(position);
-    }
+  UserActionInput() : super();
 
   @override
   void update(double t) {
@@ -43,6 +39,8 @@ class UserActionInput extends SpriteComponent {
     if (sprite != null && sprite.loaded() && x != null && y != null) {
       prepareCanvas(canvas);
       sprite.render(canvas, width, height);
+//      print('${this.x}, ${this.y}');
+//      print('W: ${this.width}, H: ${this.height}');
     }
   }
 
@@ -73,10 +71,10 @@ class UserActionInput extends SpriteComponent {
     double lenY = pos.dy - center.dy;
     double lenX = pos.dx - center.dx;
     double rad = this.width/2;
-    print('LenY: $lenY, c.y: ${center.dy}, pos.y: ${pos.dy}');
+
     double cos = lenX/rad;
     double sin = lenY/rad;
-    print('Cos: $cos, Sin: $sin}');
+
     return new Offset(cos, sin);
   }
 }

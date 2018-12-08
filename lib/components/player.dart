@@ -72,17 +72,6 @@ class Player extends PositionComponent {
     if(this.moving == true){
       x = (x + (this.speedFactor * targetPos.dx));
       y = (y + (this.speedFactor * targetPos.dy));
-      print(x);
-//      if(targetPos.dx > && this.checkBoundsX()){
-//        x = x+1;
-//      }else if (this.checkBoundsX()) {
-//        x = x-1;
-//      }
-//      if(targetPos.dy > 325.00 && this.checkBoundsY()){
-//        y = y+1;
-//      }else if(this.checkBoundsY()) {
-//        y = y-1;
-//      }
     }
   }
 }

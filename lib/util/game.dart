@@ -9,13 +9,7 @@ import 'package:flutter/material.dart' as material;
 import 'package:flame/flame.dart';
 import 'package:flame/game.dart';
 import 'package:flame/sprite.dart';
-import 'package:flame/animation.dart';
-import 'package:flame/components/component.dart';
-import 'package:flame/components/parallax_component.dart';
-import 'package:flame/components/animation_component.dart';
-import 'package:flame/components/debug_component.dart';
 import 'package:flame/position.dart';
-import 'package:flame/sprite.dart';
 
 import '../components/player.dart';
 import '../components/creep.dart';
@@ -24,15 +18,6 @@ import 'package:flutter_game/ui/userActionInput.dart';
 import '../util/background.dart';
 import '../ui/healthbar.dart';
 
-
-
-
-// TODO: What are these and why are they here?
-const double BAR_SIZE = 16.0;
-const double SECTOR_LENGTH = 1000.0;
-
-final tenth = (Size size) => (size.height - 2 * BAR_SIZE) / 8;
-math.Random random = new math.Random();
 // SET THE DIFFERENT STATE OPTIONS
 enum GameState {
   RUNNING, DEAD, AD, STOPPED
@@ -46,41 +31,56 @@ class GameClass extends BaseGame {
   double gameSpeed = 50.0;
   Player player = new Player();
 
-  UserActionInput controlPad = new UserActionInput(
-      new Sprite('raise_sprite.png', width : 150.0),
-      new Sprite('raise_sprite.png', x : 150.0, width : 150.0),
-      75.0,
-      new Position(10.0, 200.0)
-  )
-    ..coolDownLimit = 0.1;
+  UserActionInput controlPad = new UserActionInput();
+//      new Sprite('raise_sprite.png', width : 150.0),
+//      new Sprite('raise_sprite.png', x : 150.0, width : 150.0),
+//      75.0,
+//      new Position(0.0, 0.0)
+//  )
+//    ..coolDownLimit = 10.1;
 
   // TODO: create HUD builder that adds components on
-  UserActionInput summon = new UserActionInput(
-    new Sprite('raise_sprite.png', width : 150.0),
-    new Sprite('raise_sprite.png', x : 150.0, width : 150.0),
-    75.0,
-      new Position(600.0, 335.0)
-  )
-    ..coolDownLimit = 10.5;
-  UserActionInput attack = new UserActionInput(
-      new Sprite('ember_sprite.png', width : 150.0),
-      new Sprite('ember_sprite.png', x : 150.0, width : 150.0),
-      75.0,
-      new Position(520.0, 335.0)
-  )
-    ..coolDownLimit = 3.5;
+  UserActionInput summon = new UserActionInput();
+//    Sprite('raise_sprite.png', width : 150.0),
+//    Sprite('raise_sprite.png', x : 150.0, width : 150.0),
+//    75.0,
+//      new Position(600.0, 350.0)
+//  )
+//    ..coolDownLimit = 10.5;
+  UserActionInput attack = new UserActionInput();
+
+//  new Sprite('ember_sprite.png', width : 150.0),
+//  new Sprite('ember_sprite.png', x : 150.0, width : 150.0),
+//  75.0,
+//  new Position(520.0, 335.0)
+//    ..coolDownLimit = 3.5;
+
   StaticBackground bg = new StaticBackground();
 
   List<Creep> creepArray = new List();
   List<Entity> entityArray = new List();
+  // TODO: center pos
   Position playerPos = new Position(0.0, 0.0);
   HealthBar healthBar = new HealthBar();
 
   // TODO: create a dataStructure to manage info?
 
+  GameClass(this.dimensions) {
+    _start();
+    print(dimensions);
+    this.player.dimensions = this.dimensions;
+    this.bg.load(['grass.png']);
+    this.bg.resize(this.dimensions);
 
 
-
+    this.controlPad.setByPosition(new Position(this.dimensions.width * 0.025, (this.dimensions.height * 0.9725) - controlPad.height));
+    this.controlPad.active = new Sprite('raise_sprite.png', width : 150.0);
+    this.controlPad.inactive = new Sprite('raise_sprite.png', x : 150.0, width : 150.0);
+    this.controlPad.resize(Size(150.0, 150.0));
+    this.controlPad.width = 150.0;
+    this.controlPad.height = 150.0;
+    this.controlPad.coolDownLimit = 0.1;
+  }
   set state(GameState state) {
     if (state == GameState.STOPPED) {
       if (music != null) {
@@ -89,22 +89,28 @@ class GameClass extends BaseGame {
     }
     _state = state;
   }
-  GameClass(this.dimensions) {
-    _start();
-    print(this.dimensions);
-    this.player.dimensions = this.dimensions;
-    this.bg.load(['grass.png']);
-    this.bg.resize(this.dimensions);
-    this.controlPad.setBySize(new Position(150.0, 150.0));
-    this.controlPad.setByPosition(new Position(this.dimensions.width * 0.025, (this.dimensions.height * 0.9725) - controlPad.height));
-    print(this.controlPad.x);
-  }
   handleDrag(Offset offset) {
     // TODO: this needs to be lighter weight consider having some mapping for any hud controls managed by a separate object
-
     if(this.controlPad.inBoundingBox(offset)){
       this.player.targetPos = this.controlPad.calculateSinCosine(offset);
       this.player.moving = true;
+    } else {
+      this.player.targetPos = new Offset(0.0, 0.0);
+      this.player.moving = false;
+    }
+
+    if(this.summon.inBoundingBox(offset)){
+      this.summon.state = 'inactive';
+      Creep newCreep = new Creep();
+      this.creepArray.add(newCreep);
+      add(newCreep);
+    }
+
+    if(this.attack.inBoundingBox(offset)){
+      this.attack.state = 'inactive';
+      Entity newEntity = new Entity();
+      this.entityArray.add(newEntity);
+      add(newEntity);
     }
   }
   void _start() {
@@ -117,27 +123,10 @@ class GameClass extends BaseGame {
     add(this.summon);
     add(this.attack);
     add(this.healthBar);
-
-
     state = GameState.RUNNING;
 
   }
   // TODO: create separate function that delegates action based on an array of components and distance from evt
-  void generateCreep(Offset offset) {
-
-    if(this.summon.inBoundingBox(offset)){
-      this.summon.state = 'inactive';
-      Creep newCreep = new Creep();
-      this.creepArray.add(newCreep);
-      add(newCreep);
-    }
-    if(this.attack.inBoundingBox(offset)){
-      this.attack.state = 'inactive';
-      Entity newEntity = new Entity();
-      this.entityArray.add(newEntity);
-      add(newEntity);
-    }
-  }
 
 
   @override

@@ -25,8 +25,6 @@ class Entity extends PositionComponent {
   double attackCoolDown = 15.0;
   double attackCool = 0.0;
 
-
-
   Entity() {
     //TODO: map these correctly by putting into array or something
     final sprite = 'knight__idle.png';

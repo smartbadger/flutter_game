@@ -60,6 +60,7 @@ flutter:
     - assets/images/knight__improved_slash_animation.png
     - assets/images/knight_death_animation.png
     - assets/images/knight_walk_animation.png
+    - assets/images/gamepad.png
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.io/assets-and-images/#resolution-aware.
