@@ -72,13 +72,13 @@ class GameClass extends BaseGame {
     this.bg.load(['grass.png']);
     this.bg.resize(this.dimensions);
 
-
-    this.controlPad.setByPosition(new Position(this.dimensions.width * 0.025, (this.dimensions.height * 0.9725) - controlPad.height));
-    this.controlPad.active = new Sprite('raise_sprite.png', width : 150.0);
-    this.controlPad.inactive = new Sprite('raise_sprite.png', x : 150.0, width : 150.0);
-    this.controlPad.resize(Size(150.0, 150.0));
     this.controlPad.width = 150.0;
     this.controlPad.height = 150.0;
+    this.controlPad.setByPosition(new Position(this.dimensions.width * 0.01, (this.dimensions.height * 0.99) - controlPad.height));
+    this.controlPad.active = new Sprite('gamepad.png', width : 512.0);
+    this.controlPad.inactive = this.controlPad.active;
+    this.controlPad.resize(Size(150.0, 150.0));
+
     this.controlPad.coolDownLimit = 0.1;
   }
   set state(GameState state) {

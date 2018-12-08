@@ -36,7 +36,8 @@ class _HomeScreenState extends State<HomeScreen> {
       'knight__idle.png',
       'knight__improved_slash_animation.png',
       'knight_death_animation.png',
-      'knight_walk_animation.png'
+      'knight_walk_animation.png',
+      'gamepad.png'
     ]).then((images) =>
           print('Done loading ' + images.length.toString() + ' images.')),
       //  Data.loadAll(),
