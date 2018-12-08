@@ -30,25 +30,22 @@ class GameClass extends BaseGame {
   GameState get state => _state;
   double gameSpeed = 50.0;
   Player player = new Player();
+  Entity eman = new Entity();
 
   UserActionInput controlPad = new UserActionInput();
-//      new Sprite('raise_sprite.png', width : 150.0),
-//      new Sprite('raise_sprite.png', x : 150.0, width : 150.0),
-//      75.0,
-//      new Position(0.0, 0.0)
-//  )
-//    ..coolDownLimit = 10.1;
+
 
   // TODO: create HUD builder that adds components on
-  UserActionInput summon = new UserActionInput();
-//    Sprite('raise_sprite.png', width : 150.0),
-//    Sprite('raise_sprite.png', x : 150.0, width : 150.0),
-//    75.0,
-//      new Position(600.0, 350.0)
-//  )
-//    ..coolDownLimit = 10.5;
-  UserActionInput attack = new UserActionInput();
+  UserActionInput summon = new UserActionInput()
+    ..height = 100.0
+    ..width = 100.0
+    ..active = Sprite('raise_sprite.png', width : 150.0)
+    ..inactive = Sprite('raise_sprite.png', x : 150.0, width : 150.0)
+    ..x = 550.0
+    ..y = 300.0
+    ..coolDownLimit = 10.5;
 
+  UserActionInput attack = new UserActionInput();
 //  new Sprite('ember_sprite.png', width : 150.0),
 //  new Sprite('ember_sprite.png', x : 150.0, width : 150.0),
 //  75.0,
@@ -71,14 +68,14 @@ class GameClass extends BaseGame {
     this.player.dimensions = this.dimensions;
     this.bg.load(['grass.png']);
     this.bg.resize(this.dimensions);
-
+    // must set size first before trying to set position
     this.controlPad.width = 150.0;
     this.controlPad.height = 150.0;
+    // TODO: create a UI layout manager?
     this.controlPad.setByPosition(new Position(this.dimensions.width * 0.01, (this.dimensions.height * 0.99) - controlPad.height));
     this.controlPad.active = new Sprite('gamepad.png', width : 512.0);
     this.controlPad.inactive = this.controlPad.active;
     this.controlPad.resize(Size(150.0, 150.0));
-
     this.controlPad.coolDownLimit = 0.1;
   }
   set state(GameState state) {
@@ -106,12 +103,12 @@ class GameClass extends BaseGame {
       add(newCreep);
     }
 
-    if(this.attack.inBoundingBox(offset)){
-      this.attack.state = 'inactive';
-      Entity newEntity = new Entity();
-      this.entityArray.add(newEntity);
-      add(newEntity);
-    }
+//    if(this.attack.inBoundingBox(offset)){
+//      this.attack.state = 'inactive';
+////      Entity newEntity = new Entity();
+//      this.entityArray.add(newEntity);
+//      add(newEntity);
+//    }
   }
   void _start() {
     Flame.util.addGestureRecognizer(createDragRecognizer());
@@ -119,6 +116,7 @@ class GameClass extends BaseGame {
 
     add(this.bg);
     add(this.player);
+    add(this.eman);
     add(this.controlPad);
     add(this.summon);
     add(this.attack);
@@ -168,12 +166,12 @@ class GameClass extends BaseGame {
           creep.state = 'idle';
         }
         // TODO: flawed logic here, its just to get it working
-        if(entityArray.length > 0 ){
-          if(creep.distance(entityArray[0]) > (entityArray[0].width)){
-            creep.attack(entityArray[0]);
-            entityArray[0].attack(creep);
-          }
-        }
+//        if(entityArray.length > 0 ){
+//          if(creep.distance(entityArray[0]) > (entityArray[0].width)){
+//            creep.attack(entityArray[0]);
+//            entityArray[0].attack(creep);
+//          }
+//        }
 
       });
 
@@ -182,7 +180,7 @@ class GameClass extends BaseGame {
         // TODO: needs better handling of radial movement, and doesn't turn off, also need smoother animation handling
         if (entity.distance(this.player) > (this.player.width + 30.0)) {
           entity.state = 'running';
-          entity.targetPos = this.playerPos;
+//          entity.targetPos = this.playerPos;
         } else {
           entity.state = 'idle';
         }
