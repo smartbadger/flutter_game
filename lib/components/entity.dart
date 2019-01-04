@@ -21,6 +21,7 @@ class Entity extends PositionComponent {
   bool moving = false;
   Size dimensions = new Size(0.0, 0.0);
   double health = 100.0;
+  // TODO: might need separate debug for collision vs sprite
   Color debugColor = const Color(0xFFFF00FF);
   bool inDebugMode = true;
 
@@ -30,18 +31,8 @@ class Entity extends PositionComponent {
 
 
   // TODO: build a datasheet with all the sprite values, animations and states to be called anytime
-  Entity() {
+  Entity(this.animations);
 
-    final sprite = 'wizard_idle.png';
-    animations = new Map<String, Animation>();
-    // TODO: create some kind of mapping for init as not all objs will have same animations
-    animations['running'] = new Animation.sequenced(sprite, 10, textureWidth: 80.0)
-      ..stepTime = 0.1;
-    animations['dead'] = new Animation.sequenced(sprite, 3, textureWidth: 16.0, textureX: 16.0 * 8)
-      ..stepTime = 0.075;
-    state = 'running';
-
-  }
   // TODO: trim to one function?
   bool checkBoundsX() {
     if(this.dimensions.width < x){
@@ -71,9 +62,9 @@ class Entity extends PositionComponent {
   @override
   void render(Canvas canvas) {
     prepareCanvas(canvas);
-    animations[state].getSprite().render(canvas, 80.0, 80.0);
+    animations[state].getSprite().render(canvas, width, height);
     if(this.inDebugMode){
-      canvas.drawRect(new Rect.fromLTWH(0.0, 0.0, width, height), paint);
+      canvas.drawRect(new Rect.fromLTWH(x, y, width, height), paint);
     }
   }
 

@@ -30,7 +30,9 @@ class GameClass extends BaseGame {
   GameState get state => _state;
   double gameSpeed = 50.0;
   Player player = new Player();
-  Entity eman = new Entity();
+  Entity eman = new Entity() //TODO: animation generator
+    ..width = 100.0
+    ..height = 100.0;
 
   UserActionInput controlPad = new UserActionInput();
 
